@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport"  content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<title>todolist</title>
+<link href="lib/bootstrap.min.css" rel="stylesheet">
+<script src="lib/jquery-1.7.2.js"></script>
+<script src="lib/bootstrap.js"></script>
+<script src="lib/vue.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <form role="form">
+            <div class="form-group">
+                <label for="workcontent">工作内容：</label>
+               <textarea name="workcontent" cols="30" rows="10" class="form-control" placeholder="要做点啥呢......" v-model="msg"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="button" value="添加" class="btn btn-primary btn-sm" v-on:click="add()">
+                <input type="reset" value="重置" class="btn btn-danger btn-sm">
+            </div>
+        </form>
+        <hr>
+        <table class="table table-border table-hover">
+        <caption class="h3 text-info">待处理事项</caption>
+            <tr>
+                <th class="text-center" width="20%">序号</th>
+                <th class="text-center" width="50%">工作内容</th>
+                <th class="text-center" width="20%">操作</th>
+            </tr>
+            <tr v-bind:class="classA" v-for="data in myData">
+                <td  width="20%">{{$index+1}}</td>
+                <td  width="50%">{{data.content}}</td>
+                <td  width="20%">
+                    <button class="btn btn-primary btn-sm" v-on:click="isProcess($index)">已完成</button>
+                </td>
+            </tr>
+            <tr v-show="myData.length==0">
+                <td colspan="4" class="text-center text-muted">
+                    暂无数据......
+                </td>
+            </tr>
+        </table>
+        <hr>
+         <table class="table table-border table-hover">
+        <caption class="h3 text-info">已处理事项</caption>
+            <tr>
+                <th class="text-center" width="20%">序号</th>
+                <th class="text-center" width="50%">工作内容</th>
+                <th class="text-center" width="20%">操作</th>
+            </tr>
+            <tr v-bind:class="classA" v-for="data in processedData">
+                <td width="20%">{{$index+1}}</td>
+                <td width="50%">{{data.content}}</td>
+                <td width="20%">
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#layer" v-on:click="nowIndex=$index">删除</button>
+                </td>
+            </tr>
+            <tr v-show="processedData.length!=0">
+                <td colspan="4" class="text-right">
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#layer" v-on:click="nowIndex=-1">全部删除</button>
+                </td>
+            </tr>
+            <tr v-show="processedData.length==0">
+                <td colspan="4" class="text-center text-muted">
+                    暂无数据......
+                </td>
+            </tr>
+        </table>
+
+        <!-- bootstrap 之模态框，即弹出框  -->
+        <div role="dialog" class="modal fade bs-example-modal-sm" id="layer"> 
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <h4 class="modal-title" v-if="nowIndex != -1">确定删除序号为{{nowIndex+1}}的数据吗
+                        </h4>
+                        <h4 class="modal-title" v-else>
+                            确定删除全部数据吗？
+                        </h4>
+                    </div>
+                    <div class="modal-body text-right">
+                        <button class="btn btn-primary" data-dismiss="modal">取消</button>
+                        <button class="btn btn-danger" data-dismiss="modal" v-on:click="deleteMsg(nowIndex)">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    var c = new Vue({
+        el: "#app",
+        data: {
+            myData: [],
+            processedData: [],
+            msg: '',
+            nowIndex: -100,
+            classA: 'text-center'
+        },
+        methods: {
+            add: function () {
+                this.myData.push({
+                    content: this.msg
+                })
+                this.msg = ''
+            },
+            deleteMsg: function (dataIndex) {
+                if (dataIndex === -1) {
+                    this.processedData = []
+                } else {
+                    this.processedData.splice(dataIndex, 1)
+                }
+                
+            },
+            isProcess: function (dataIndex) {
+                var data = this.myData[dataIndex]
+                var str = ''
+                for (var i in data) {
+                   str = data[i]
+                }
+                this.processedData.push({
+                    content: str
+                })
+                 this.myData.splice(dataIndex, 1)
+            }
+        }
+    })
+</script>
+</html>
